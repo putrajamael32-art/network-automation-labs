@@ -1,0 +1,25 @@
+---
+# Lab 02 - First Ansible Playbook
+# Purpose: Gather and display basic facts from a Cisco IOS router
+
+- name: Gather IOS Device Facts
+  hosts: routers
+  gather_facts: false
+  connection: network_cli
+  become: false
+
+  vars:
+    ansible_network_os: ios
+
+  tasks:
+
+    - name: Collect all device facts
+      cisco.ios.ios_facts:
+        gather_subset: all
+
+    - name: Display hostname and OS version
+      ansible.builtin.debug:
+        msg:
+          - "Hostname : {{ ansible_net_hostname }}"
+          - "IOS Version : {{ ansible_net_version }}"
+          - "Model     : {{ ansible_net_model }}"
