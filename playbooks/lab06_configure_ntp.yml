@@ -1,0 +1,29 @@
+---
+- name: Configure Network Time Protocol (NTP)
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+  become: false
+
+  vars_files:
+    - vars/ntp_vars.yml
+
+  tasks:
+    - name: Generate and apply NTP configurations
+      cisco.ios.ios_config:
+        src: templates/ntp_config.j2
+        match: line
+
+    - name: Save configuration
+      cisco.ios.ios_config:
+        save_when: always
+
+    - name: Verify NTP configuration status
+      cisco.ios.ios_command:
+        commands:
+          - show running-config | include ntp
+      register: ntp_verify
+
+    - name: Output applied configuration verification
+      ansible.builtin.debug:
+        var: ntp_verify.stdout_lines
